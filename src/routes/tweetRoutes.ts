@@ -1,29 +1,83 @@
-import { Router, Request, Response } from 'express';
-import { NOT_IMPLEMENTED } from '../statusCodes';
+import { Router } from 'express';
+import {
+	INTERNAL_SERVER_ERROR, CREATED,
+	BAD_REQUEST,
+	OK,
+	ACCEPTED,
+	NOT_FOUND
+} from '../statusCodes';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
-router.post('/', (req: Request, res: Response) => {
-	res.status(NOT_IMPLEMENTED).json({ error: 'Not implemented' });
+router.get('/', async (_, res) => {
+	try {
+		const tweets = await prisma.tweet.findMany();
+		res.json(tweets);
+	}
+	catch (error) {
+		res.status(INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
+	}
 });
 
-router.get('/', (req: Request, res: Response) => {
-	res.status(NOT_IMPLEMENTED).json({ error: 'Not implemented' });
+router.post('/', async (req, res) => {
+	try {
+		const { content, image, impression, userId } = req.body;
+		const result = await prisma.tweet.create({
+			data: {
+				content,
+				image,
+				impression,
+				userId
+			}
+		});
+		res.status(CREATED).json(result);
+	}
+	catch (error) {
+		res.status(BAD_REQUEST).json({ error: 'Bad request' });
+	}
 });
 
-router.get('/:id', (req: Request, res: Response) => {
+router.get('/:id', async (req, res) => {
 	const { id } = req.params;
-	res.status(NOT_IMPLEMENTED).json({ error: `Not implemented ${ id }` });
+	try {
+		const tweet = await prisma.tweet.findUnique({ where: { id: Number(id) } });
+		res.status(OK).json(tweet);
+	}
+	catch (error) {
+		res.status(NOT_FOUND).json({ error: `Not found ${ id }` });
+	}
 });
 
-router.put('/:id', (req: Request, res: Response) => {
+router.put('/:id', async (req, res) => {
 	const { id } = req.params;
-	res.status(NOT_IMPLEMENTED).json({ error: `Not implemented ${ id }` });
+	try {
+		const { content, image, userId } = req.body;
+		const result = await prisma.tweet.update({
+			where: { id: Number(id) },
+			data: {
+				content,
+				image,
+				userId
+			}
+		});
+		res.status(OK).json(result);
+	}
+	catch (error) {
+		res.status(NOT_FOUND).json({ error: `Not found ${ id }` });
+	}
 });
 
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', async (req, res) => {
 	const { id } = req.params;
-	res.status(NOT_IMPLEMENTED).json({ error: `Not implemented ${ id }` });
+	try {
+		await prisma.tweet.delete({ where: { id: Number(id) } });
+		res.sendStatus(ACCEPTED);
+	}
+	catch (error) {
+		res.status(NOT_FOUND).json({ error: `Not found ${ id }` });
+	}
 });
 
 export default router;

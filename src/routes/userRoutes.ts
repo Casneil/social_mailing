@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { INTERNAL_SERVER_ERROR, CREATED, BAD_REQUEST, OK, ACCEPTED } from '../statusCodes';
+import {
+	INTERNAL_SERVER_ERROR, CREATED,
+	BAD_REQUEST,
+	OK,
+	ACCEPTED,
+	NOT_FOUND
+} from '../statusCodes';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
@@ -40,7 +46,7 @@ router.get('/:id', async (req, res) => {
 		res.json(user);
 	}
 	catch (error) {
-		res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+		res.status(NOT_FOUND).json({ error: `Not found ${ id }` });
 	}
 });
 
@@ -59,7 +65,7 @@ router.put('/:id', async (req, res) => {
 		res.status(OK).json(result);
 	}
 	catch (error) {
-		res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+		res.status(NOT_FOUND).json({ error: `Not found ${ id }` });
 	}
 });
 
@@ -72,7 +78,7 @@ router.delete('/:id', async (req, res) => {
 		res.sendStatus(ACCEPTED).send();
 	}
 	catch (error) {
-		res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+		res.status(NOT_FOUND).json({ error: `Not found ${ id }` });
 	}
 });
 
