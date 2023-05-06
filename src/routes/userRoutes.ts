@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { INTERNAL_SERVER_ERROR, CREATED, BAD_REQUEST } from '../statusCodes';
+import { INTERNAL_SERVER_ERROR, CREATED, BAD_REQUEST, OK, ACCEPTED } from '../statusCodes';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
@@ -44,14 +44,36 @@ router.get('/:id', async (req, res) => {
 	}
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
 	const { id } = req.params;
-	res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+	try {
+		const { bio, name, image } = req.body;
+		const result = await prisma.user.update({
+			where: { id: Number(id) },
+			data: {
+				bio,
+				name,
+				image
+			}
+		});
+		res.status(OK).json(result);
+	}
+	catch (error) {
+		res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+	}
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
 	const { id } = req.params;
-	res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+	try {
+		await prisma.user.delete({
+			where: { id: Number(id ) }
+		});
+		res.sendStatus(ACCEPTED).send();
+	}
+	catch (error) {
+		res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+	}
 });
 
 export default router;

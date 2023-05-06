@@ -5,6 +5,7 @@ const MOVED_PERMANENTLY = 301;
 const BAD_REQUEST = 400;
 const OK = 200;
 const NOT_FOUND = 404;
+const ACCEPTED = 202;
 
 export {
 	NOT_IMPLEMENTED,
@@ -13,5 +14,6 @@ export {
 	OK,
 	NOT_FOUND,
 	MOVED_PERMANENTLY,
-	BAD_REQUEST
+	BAD_REQUEST,
+	ACCEPTED
 };
