@@ -18,6 +18,7 @@ model User {
   image String?
   bio String?
   isVerified Boolean @default(false)
+  tweets Tweet[]
 }
 
 model Tweet {
@@ -27,4 +28,6 @@ model Tweet {
   content String
   image String?
   impression Int @default(0)
+  userId Int
+  user User @relation(fields: [userId], references: [id])
 }
