@@ -13,7 +13,19 @@ const prisma = new PrismaClient();
 
 router.get('/', async (_, res) => {
 	try {
-		const allUsers = await prisma.user.findMany();
+		const allUsers = await prisma.user.findMany({
+			include: {
+				tweets: {
+					select: {
+						id: true,
+						image: true,
+						content: true,
+						createdAt: true,
+						updatedAt: true,
+						impression: true
+					}
+				}
+			} });
 		res.json(allUsers);
 	}
 	catch (error) {
@@ -42,7 +54,19 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
-		const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+		const user = await prisma.user.findUnique({
+			where: { id: Number(id) },
+			include: { tweets: {
+				select: {
+					id: true,
+					image: true,
+					content: true,
+					createdAt: true,
+					updatedAt: true,
+					impression: true
+				}
+			} }
+		});
 		res.json(user);
 	}
 	catch (error) {
@@ -55,7 +79,9 @@ router.put('/:id', async (req, res) => {
 	try {
 		const { bio, name, image } = req.body;
 		const result = await prisma.user.update({
-			where: { id: Number(id) },
+			where: {
+				id: Number(id)
+			},
 			data: {
 				bio,
 				name,

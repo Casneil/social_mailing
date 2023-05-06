@@ -13,7 +13,17 @@ const prisma = new PrismaClient();
 
 router.get('/', async (_, res) => {
 	try {
-		const tweets = await prisma.tweet.findMany();
+		const tweets = await prisma.tweet.findMany({
+			include: {
+				user: {
+					select: {
+						id: true,
+						name: true,
+						image: true,
+						username: true
+					}
+				} }
+		});
 		res.json(tweets);
 	}
 	catch (error) {
@@ -42,7 +52,10 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
-		const tweet = await prisma.tweet.findUnique({ where: { id: Number(id) } });
+		const tweet = await prisma.tweet.findUnique({
+			where: { id: Number(id) },
+			include: { user: true }
+		});
 		res.status(OK).json(tweet);
 	}
 	catch (error) {
@@ -56,6 +69,7 @@ router.put('/:id', async (req, res) => {
 		const { content, image, userId } = req.body;
 		const result = await prisma.tweet.update({
 			where: { id: Number(id) },
+			include: { user: true },
 			data: {
 				content,
 				image,
