@@ -14,7 +14,7 @@ model User {
   updatedAt DateTime @updatedAt
   email String @unique
   name String
-  username String
+  username String @unique
   image String?
   bio String?
   isVerified Boolean @default(false)

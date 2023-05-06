@@ -1,29 +1,57 @@
-import { Router, Request, Response } from 'express';
-import { NOT_IMPLEMENTED } from '../statusCodes';
+import { Router } from 'express';
+import { INTERNAL_SERVER_ERROR, CREATED, BAD_REQUEST } from '../statusCodes';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
-router.post('/', (req: Request, res: Response) => {
-	res.status(NOT_IMPLEMENTED).json({ error: 'Not implemented' });
+router.get('/', async (_, res) => {
+	try {
+		const allUsers = await prisma.user.findMany();
+		res.json(allUsers);
+	}
+	catch (error) {
+		res.status(INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
+	}
 });
 
-router.get('/', (req: Request, res: Response) => {
-	res.status(NOT_IMPLEMENTED).json({ error: 'Not implemented' });
+router.post('/', async (req, res) => {
+	try {
+		const { email, name, username } = req.body;
+		const result = await prisma.user.create({
+			data: {
+				email,
+				name,
+				username,
+				bio: 'Hello I\'m new here!'
+			}
+		});
+		res.status(CREATED).json(result);
+	}
+	catch (error) {
+		res.status(BAD_REQUEST).json({ error: 'Username or email should be unique' });
+	}
 });
 
-router.get('/:id', (req: Request, res: Response) => {
+router.get('/:id', async (req, res) => {
 	const { id } = req.params;
-	res.status(NOT_IMPLEMENTED).json({ error: `Not implemented ${ id }` });
+	try {
+		const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+		res.json(user);
+	}
+	catch (error) {
+		res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
+	}
 });
 
-router.put('/:id', (req: Request, res: Response) => {
+router.put('/:id', (req, res) => {
 	const { id } = req.params;
-	res.status(NOT_IMPLEMENTED).json({ error: `Not implemented ${ id }` });
+	res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
 });
 
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', (req, res) => {
 	const { id } = req.params;
-	res.status(NOT_IMPLEMENTED).json({ error: `Not implemented ${ id }` });
+	res.status(BAD_REQUEST).json({ error: `Not found ${ id }` });
 });
 
 export default router;
