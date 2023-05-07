@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
-	INTERNAL_SERVER_ERROR, CREATED,
+	INTERNAL_SERVER_ERROR,
+	CREATED,
 	BAD_REQUEST,
 	OK,
 	ACCEPTED,
@@ -99,7 +100,7 @@ router.delete('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
 		await prisma.user.delete({
-			where: { id: Number(id ) }
+			where: { id: Number(id) }
 		});
 		res.sendStatus(ACCEPTED).send();
 	}

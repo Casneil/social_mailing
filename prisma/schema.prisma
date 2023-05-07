@@ -13,12 +13,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email String @unique
-  name String
-  username String @unique
+  name String?
+  username String? @unique
   image String?
   bio String?
   isVerified Boolean @default(false)
   tweets Tweet[]
+  tokens Token[]
 }
 
 model Tweet {
@@ -28,6 +29,18 @@ model Tweet {
   content String
   image String?
   impression Int @default(0)
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Token {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type String // Email or JWT
+  emailToken String? @unique
+  isValidToken Boolean @default(true)
+  expiration DateTime
   userId Int
   user User @relation(fields: [userId], references: [id])
 }

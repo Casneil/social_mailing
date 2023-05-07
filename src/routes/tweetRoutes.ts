@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
-	INTERNAL_SERVER_ERROR, CREATED,
+	INTERNAL_SERVER_ERROR,
+	CREATED,
 	BAD_REQUEST,
 	OK,
 	ACCEPTED,
