@@ -36,6 +36,9 @@ To run this project, you will need to add the following environment variables to
 
 `npx prisma migrate dev --name 'your migration name'` for Database migrations
 
+## Swagger
+[Test Api Endpoints](http://localhost:5000/api-docs)
+
 ## FAQ
 
 #### Is this a complete project?
