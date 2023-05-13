@@ -1,37 +1,45 @@
 
 import jwt from 'jsonwebtoken';
-import { PrismaClient, Token, User } from '@prisma/client';
+import { PrismaClient, Token } from '@prisma/client';
 import { Request, Response } from 'express';
+import { getJwtSecret } from '../../utils/getSecrets';
+import { sendEmailToAuthenticateUser } from '../../services/email/mailingService';
+import { replaceString } from '../../utils/replaceString';
 import {
 	INTERNAL_SERVER_ERROR,
 	OK,
 	UNAUTHORIZED
 } from '../../statusCodes';
-import { mailingService } from '../../services/email/mailingService';
+
+import {
+	AUTHENTICATION_EXPIRATION_DAYS,
+	MULTIPLICATION_FACTOR,
+	RANDOM_FACTOR,
+	EMAIL_TOKEN_EXPIRATION_MINUTES,
+	EMAIL_CONFIG
+} from '../../constants';
 
 const prisma = new PrismaClient();
 
-const MULTIPLICATION_FACTOR = 10000000;
-const RANDOM_FACTOR = 90000000;
-const EMAIL_TOKEN_EXPIRATION_MINUTES = 10 * 60 * 1000;
-const AUTHENTICATION_EXPIRATION_DAYS = 2 * 24 * 60 * 1000;
-const DEV_SECRET = '0e6f7f41-8bd2-4346-9335-e477a6fc3855';
-const JWT_SECRET = process.env.NODE_ENV === 'dev' ? DEV_SECRET : process.env.JWT_SECRET;
-
 const generateEmailToken = (): string => {
-	return Math.floor(MULTIPLICATION_FACTOR + Math.random() * RANDOM_FACTOR).toString();
+	return Math.floor(MULTIPLICATION_FACTOR + Math.random() * RANDOM_FACTOR)
+		.toString();
 };
 
 const generateJwtAuthToken = (tokenId: number): string => {
 	const payload = { tokenId };
 
-	return jwt.sign(payload, JWT_SECRET!, {
+	return jwt.sign(payload, getJwtSecret(), {
 		algorithm: 'HS256',
 		noTimestamp: true
 	})
 };
 
-const createUserJwtToken = async (email: string, persistedToken: Token): Promise<string> => {
+const createUserJwtToken = async (
+	email: string,
+	persistedToken: Token
+	): Promise<string> => {
+
 	const expiration = new Date(new Date().getTime() + AUTHENTICATION_EXPIRATION_DAYS);
 	await prisma.token.update({
 		where: { id: persistedToken.id },
@@ -39,7 +47,7 @@ const createUserJwtToken = async (email: string, persistedToken: Token): Promise
 	});
 	const apiToken = await prisma.token.create({
 		data: {
-			type: 'API', // Change to enum when using postgreqsl or sql database.
+			type: 'API', //TODO: Change to enum when using postgreqsl or sql database.
 			expiration,
 			user: {
 				connect: { email }
@@ -50,38 +58,44 @@ const createUserJwtToken = async (email: string, persistedToken: Token): Promise
 	return generateJwtAuthToken(apiToken.id);
 
 }
-//TODO: I stopped at: 3:23:38 on vid: https://www.youtube.com/watch?v=mABcyifdsww
 
-const validateUser = async (res: Response, persistedToken: any, email: string): Promise<Response> => {
+const validateUser = async (
+	res: Response, persistedEmailToken: any,
+	email: string
+	) : Promise<Response> => {
 
-	if (!persistedToken || !persistedToken.isValidToken) {
+	if (!persistedEmailToken || !persistedEmailToken.isValidToken) {
 		return res.status(UNAUTHORIZED).json({ error: 'Token not valid' });
 	}
 
 	if (
-		persistedToken !== null &&
-		persistedToken.expiration < new Date()
+		persistedEmailToken !== null &&
+		persistedEmailToken.expiration < new Date()
 	) {
 		return res.status(UNAUTHORIZED).json({ error: 'Token not valid' });
 	}
 
-	if (persistedToken?.user?.email !== email) {
+	if (persistedEmailToken?.user?.email !== email) {
 		return res.sendStatus(UNAUTHORIZED);
 	}
 
-	const jwtToken = await createUserJwtToken(email, persistedToken);
+	const jwtToken = await createUserJwtToken(email, persistedEmailToken);
 
 	return res.status(OK).json({ authToken: jwtToken });
 }
 
-export const createOrConnectToken = async (req: Request, res: Response): Promise<Response> => {
+export const createOrConnectToken = async (
+	req: Request,
+	res: Response
+	): Promise<Response> => {
+
 	try {
 		const { email } = req.body;
 		const emailToken = generateEmailToken();
 		const expiration = new Date(new Date().getTime() + EMAIL_TOKEN_EXPIRATION_MINUTES);
 		const userToken = await prisma.token.create({
 			data: {
-				type: 'EMAIL', // Change to enum when using postgreqsl or sql database.
+				type: 'EMAIL', //TODO: Change to enum when using postgreqsl or sql database.
 				emailToken,
 				expiration,
 				user: {
@@ -92,7 +106,16 @@ export const createOrConnectToken = async (req: Request, res: Response): Promise
 				}
 			}
 		});
-		return res.status(OK).json(userToken);
+
+		if (userToken.emailToken) {
+			await sendEmailToAuthenticateUser({
+				...EMAIL_CONFIG,
+				subject: replaceString(EMAIL_CONFIG.subject, '{code}', userToken.emailToken),
+				html: replaceString(EMAIL_CONFIG.subject, '{code}', userToken.emailToken),
+			});
+		}
+
+		return res.sendStatus(OK);
 	}
 
 	catch (error) {
@@ -101,9 +124,13 @@ export const createOrConnectToken = async (req: Request, res: Response): Promise
 
 }
 
-export const getPersistedTokenUser = async (req: Request, res: Response): Promise<Response> => {
+export const getPersistedEmailTokenUser = async (
+	req: Request,
+	res: Response
+	): Promise<Response> => {
+
 	const { email, emailToken } = req.body;
-	const persistedToken = await prisma.token.findUnique({
+	const persistedEmailToken = await prisma.token.findUnique({
 		where: {
 			emailToken,
 		},
@@ -112,5 +139,5 @@ export const getPersistedTokenUser = async (req: Request, res: Response): Promis
 		}
 	});
 
-	return validateUser(res, persistedToken, email);
+	return validateUser(res, persistedEmailToken, email);
 }

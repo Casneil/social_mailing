@@ -8,6 +8,7 @@ import {
 	NOT_FOUND
 } from '../statusCodes';
 import { PrismaClient } from '@prisma/client';
+import { AuthRequest } from '../types/authRequest';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -32,15 +33,17 @@ router.get('/', async (_, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
+router.post('/', async (req: AuthRequest, res) => {
 	try {
-		const { content, image, impression, userId } = req.body;
+		const { content, image, impression } = req.body;
+		const user = req.user;
 		const result = await prisma.tweet.create({
 			data: {
 				content,
 				image,
 				impression,
-				userId
+				// @ts-ignore
+				userId: user.id
 			}
 		});
 		res.status(CREATED).json(result);

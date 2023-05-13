@@ -37,7 +37,7 @@ model Token {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  type String // Email or JWT
+  type String //TODO: EMAIL or AUTH ENUM when using postgresql or sql database
   emailToken String? @unique
   isValidToken Boolean @default(true)
   expiration DateTime

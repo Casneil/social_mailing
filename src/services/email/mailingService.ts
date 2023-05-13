@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 		Example email config
 
 		from: '"Fred Foo 👻" <foo@example.com>', // sender address
-		to: "user@gmail.com", // list of receivers
+		to: "user@gmail.com", // list of receivers e.g 'user1@gmail.com, user2@gmail.com'
 		subject: "Hello ✔", // Subject line
 		text: "Hello world?", // plain text body
 		html: "<b>Hello world?</b>", // html body
@@ -18,7 +18,7 @@ interface MailConfig {
 	html?: string;
 }
 
-export const mailingService = async (config: MailConfig) => {
+export const sendEmailToAuthenticateUser = async (config: MailConfig) => {
 	const transporter = nodemailer.createTransport({
 		host: 'smtp.gmail.com',
 		port: 587,
@@ -29,8 +29,14 @@ export const mailingService = async (config: MailConfig) => {
 		}
 	});
 
-	const info = await transporter.sendMail({
-		...config
-	});
-	console.log("Message sent: %s", info.messageId);
+	try {
+		const info = await transporter.sendMail({
+			...config
+		});
+		console.log("Message sent: %s", info.messageId);
+	}
+	catch (error) {
+		console.error(error);
+		throw error;
+	}
 };
