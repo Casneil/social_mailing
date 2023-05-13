@@ -2,17 +2,12 @@ import { PORT } from '../utils/getServerPort';
 
 export const options = {
 	definition: {
-		openapi: '3.0.0',
 		info: {
-			title: 'Api specifications',
-			version: '1.0.0',
-			description: ''
+			title: 'OpenAPI Tweets endpoints',
+			description: 'OpenAPI specification For tweets api',
+			version: '0.0.1'
 		},
-		servers: [
-			{
-				url: `http://localhost:${ PORT }`
-			}
-		]
+		servers: [{ url: `http://localhost:${ PORT }` }]
 	},
 	apis: ['./src/routes/*.ts']
 };
