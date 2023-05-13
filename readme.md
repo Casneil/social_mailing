@@ -8,7 +8,7 @@
 - Swagger for api documentation
 ## Tech Stack
 
-**Server:** [NodeJs](https://nodejs.org/en), [Express](https://expressjs.com/de/), [Typescript](https://www.typescriptlang.org/docs/), [Prisma](https://www.prisma.io/), [Nodemailer](https://nodemailer.com/about/), [Swagger](https://swagger.io/), [Swagger UI Express](https://www.npmjs.com/package/swagger-ui-express)
+**Server:** [NodeJs](https://nodejs.org/en), [Express](https://expressjs.com/de/), [Typescript](https://www.typescriptlang.org/docs/), [Prisma](https://www.prisma.io/), [Nodemailer](https://nodemailer.com/about/), [Swagger UI Express](https://www.npmjs.com/package/swagger-ui-express)
 
 ## How to get this project
 - Clone this reposoitory to your computer
