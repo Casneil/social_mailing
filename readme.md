@@ -25,7 +25,9 @@ To run this project, you will need to add the following environment variables to
 
 ## Terminal Commands
 `npm run dev` to start local server
+
 `prisma-studio` to connect to the database and run web database ui
+
 `npx prisma migrate dev --name 'your migration name'` for Database migrations
 
 ## FAQ
