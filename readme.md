@@ -5,6 +5,7 @@
 - Jwt auth tokens
 - Email service for sending login codes
 - All CRUD operations on tweet model
+- Swagger for api documentation
 ## Tech Stack
 
 **Server:** [NodeJs](https://nodejs.org/en), [Express](https://expressjs.com/de/), [Typescript](https://www.typescriptlang.org/docs/), [Prisma](https://www.prisma.io/), [Nodemailer](https://nodemailer.com/about/)
