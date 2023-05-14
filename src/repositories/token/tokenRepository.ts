@@ -108,16 +108,20 @@ export const createOrConnectToken = async (
 		});
 
 		if (userToken.emailToken) {
+			const isDev = process.env.NODE_ENV === 'dev';
+			const sender = process.env.EMAIL_SENDER ? process.env.EMAIL_SENDER : '';
+			const recipient = isDev ? sender : email;
+
 			await sendEmailToAuthenticateUser({
 				...EMAIL_CONFIG,
+				to: recipient,
 				subject: replaceString(EMAIL_CONFIG.subject, '{code}', userToken.emailToken),
 				html: replaceString(EMAIL_CONFIG.subject, '{code}', userToken.emailToken),
 			});
 		}
 
-		return res.sendStatus(OK);
+		return res.status(OK).json({ emailToken: userToken.emailToken });
 	}
-
 	catch (error) {
 		return res.status(INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 	}
