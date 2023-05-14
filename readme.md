@@ -1,8 +1,19 @@
 # Simple social backend with email sending service
 
+## Features
+- One time password support
+- Jwt auth tokens
+- Email service for sending login codes
+- All CRUD operations on tweet model
+- Swagger for api documentation
 ## Tech Stack
 
-**Server:** [NodeJs](https://nodejs.org/en), [Express](https://expressjs.com/de/), [Typescript](https://www.typescriptlang.org/docs/), [Prisma](https://www.prisma.io/), [Nodemailer](https://nodemailer.com/about/)
+**Server:** [NodeJs](https://nodejs.org/en), [Express](https://expressjs.com/de/), [Typescript](https://www.typescriptlang.org/docs/), [Prisma](https://www.prisma.io/), [Nodemailer](https://nodemailer.com/about/), [Swagger UI Express](https://www.npmjs.com/package/swagger-ui-express)
+
+## How to get this project
+- Clone this reposoitory to your computer
+- Open the cloned project in you favourite editor e.g [VSCode](https://code.visualstudio.com/)
+- In the project root folder run the commands stated under the Terminal Commands section of this page
 
 ## Environment Variables
 
@@ -18,10 +29,26 @@ To run this project, you will need to add the following environment variables to
 
 `EMAIL_SENDER=""` your email address. In this example GMAIL.
 
+## Terminal Commands
+`npm run dev` to start local server
+
+`prisma-studio` to connect to the database and run web database ui
+
+`npx prisma migrate dev --name 'your migration name'` for Database migrations
+
+## Swagger
+[Test Api Endpoints](http://localhost:5000/api-docs)
+
 ## FAQ
 
 #### Is this a complete project?
 No, this is still WIP and new feautres will be added requently
+
+#### Can I change database provider?
+Definitely!, using `npx prisma init --datasource-provider 'your database'`
+
+#### What happen when prisma folder already exists when changing database provider?
+You can follow this guide [Upgrading the Prisma layer](https://www.prisma.io/docs/guides/upgrade-guides/upgrade-from-prisma-1/upgrading-the-prisma-layer-postgresql)
 
 ## Authors
 

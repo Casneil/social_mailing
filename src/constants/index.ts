@@ -7,8 +7,8 @@ const AUTHENTICATION_EXPIRATION_DAYS = 2 * 24 * MINUTES_MILLI_SECONDS;
 
 const EMAIL_CONFIG = {
 	from: process.env.EMAIL_SENDER ? process.env.EMAIL_SENDER : '',
-	to: process.env.EMAIL_SENDER ? process.env.EMAIL_SENDER : '',
-	subject: 'Your one login time password: {code}',
+	to: '',
+	subject: 'Your one time login password: {code}',
 	html: '<p>Please use this code to log in <b>{code}</b></p>'
 };
 
