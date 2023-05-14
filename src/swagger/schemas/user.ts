@@ -1,6 +1,5 @@
 export const userSchema = {
 	type: 'object',
-<<<<<<< HEAD
 	required: ['email'],
 	properties: {
 		email: {
@@ -35,14 +34,6 @@ export const userSchema = {
 			type: 'string',
 			description: 'Timestamp user accounts was updated',
 			example: '00:00:1234Z'
-=======
-	required: ['name'],
-	properties: {
-		name: {
-			type: 'string',
-			description: 'Your email address',
-			example: 'Casneil Simpson'
->>>>>>> e279e55 (setting up swagger)
 		}
 	}
 };
