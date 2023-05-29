@@ -90,7 +90,7 @@ export const createOrConnectToken = async (
 	): Promise<Response> => {
 
 	try {
-		const { email } = req.body;
+		const { email, sendEmail = true } = req.body;
 		const emailToken = generateEmailToken();
 		const expiration = new Date(new Date().getTime() + EMAIL_TOKEN_EXPIRATION_MINUTES);
 		const userToken = await prisma.token.create({
@@ -107,7 +107,13 @@ export const createOrConnectToken = async (
 			}
 		});
 
-		if (userToken.emailToken) {
+		//TODO: Add better error handling
+		if (typeof sendEmail !== 'boolean' || typeof email !== 'string') {
+
+			return res.status(INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
+		}
+
+		if (userToken.emailToken && sendEmail) {
 			const isDev = process.env.NODE_ENV === 'dev';
 			const sender = process.env.EMAIL_SENDER ? process.env.EMAIL_SENDER : '';
 			const recipient = isDev ? sender : email;
